@@ -95,6 +95,7 @@
 - They all offer different performance with different prices but the common factor is that the IOPS can be configured independent of the volume size and they are designed for super high performance situations 
 
 - These are for low latency and consistent low latency are important characteristics
+- you pay for the size of the volumne and the provisioned IOPS that you need
 
 - with io1 and io2 you can achieve **64,000 IOPS per volume** - that's 4 times the maximum for GP2 and GP3
 
@@ -117,7 +118,90 @@
 
   - In addition to above IOPS constrains, there is a level of maximum performance you can achieve between EC2 and EBS
   - the performance of instance depends on the type and size of the instance
-  - with io1 - you can achieve maximum 260,000 IOPS and 7,500 MB/s per instance
+  - with **io1** - you can achieve maximum 260,000 IOPS and 7,500 MB/s per instance
+  - this means you need just over 4 volumnes performning at thier maximum performance to achive this maximum performance per instance
+  - with **io2** - the maximum you can achive is 160,000 IOPS and 4,750 MB/s per instance
+  - with **io2 Block Express** you can maximise instance with 260,000 IOPS and 7500 MB/s
+- GP2 and GP3 per instance max is 260,000 IOPS and 7,000 MB/s  
 
-  
+#### Provisioned IOPS SSD use case
+- High performance
 
+- latency sensitive workloads
+
+- I/O-intensive NoSQL
+
+- Relational Database
+
+- when you have smaller volumes but super high performnace
+
+  ## HDD Based EBS Volumes
+
+- There are two key HDD based volume types - **st1 (Throughput optimised) sc1 (Cold HDD )**
+
+- HDD based are good with sequantial data read/write 
+
+- it's good for throughout and economy than IOPS or extreme levels of performance
+
+- **st1 Stats**
+
+  - Size 125GB to 16 TB  
+  - IOPS  500 IOPS 1 MB =  Max 500 MB/s
+
+- **st1 Performance** 
+
+  - 40 MB/s/TB Base
+  - 250MB/s/TB Burst
+
+- st1 is designed when cost is a concern but you need frequent access storage for throughput intensive sequential workloads
+
+- **st1 used for**
+
+  - Big data
+  - data warehouse
+  - log processing
+
+- sc1 is designed for infrequent access and geard for maximum economy as it is the lowest cost EBS HDD volume 
+
+- **sc1 Stats**
+
+  - Size 125GB to 16 TB  
+  - IOPS  250 IOPS 1 MB =  Max 250 MB/s
+
+- **sc1 Performance** 
+
+  - 12 MB/s/TB Base
+  - 80 MB/s/TB Burst
+
+- **sc1 used for**
+
+  - Colder data requiring fewer scans per day
+
+## Instance Store Volumes - Architecture
+
+- Instance Store volume provide Block Storage - this means raw volume that can be attched to an instance which will then be formatted using the OS of the instance to be usable
+- They are just like EBS volume but local instead of over the network volumes discussed above
+- They are physically attached to one EC2 host
+- Each EC2 host has its own Instance Store volume and these volumes are isolated to that particular EC2 host
+- Instances on that EC2 host can access those volumes
+- since they are locally attached, they provide the highest level of storage performance
+- They are included in instance price - different instance types come with different instance store volumes
+- **EXAM** - Unlike EBS volumes, you have to attach these volumes at launch time
+- Depending on the instance type, you are going to be allocated certain number of instance store volumes. You can chose to use them or not but you can't adjust this later
+- **Risk** - These instance store volumes are temporary - if your nstance is stopped and started again then it would be transferred to another EC2 host where it will again be connected to a new ephemeral instance store volume but the  data will be lost as this is a new EC2 host.
+- Another risk is that if any instance store volume fails the data will be lost. These volumes are only temporary - they should not be used where persistance is required
+- The size and number of volumes vary depending on the size and type of instance 
+- Some instance type don't support instance store volumes
+- The key benefit of instance store is performance
+  - D3 = 4.6 GB/s throughput
+  - i3 = 16 GB/s of sequential throughput
+  - They have more IOPS and throughput vs EBS
+
+### Exam Poweup
+
+- Instance store are local to EC2 host 
+- you only add it at instance launch time
+- Data is lost on instance move, resize or hardware failure
+- high performance
+- The price for instance store is included in instance
+- This is a **Temporary** storage only 
