@@ -47,9 +47,9 @@
   - If you are transferring 160 KB file in one second, that means you need 10 IO in that one second 
   - You get 5.4 million IOPS credits when you provision a GP2 volume
   - You also get baseline 100 IOPS credits per second regardless of the size of volume
-  - On top of baseline you also get **3 IOPS per GB per Second**
-  - This means 100 GB volume gets you 300 IO credits per second
-  - You only get baseline IOPS if size of volume is below **33.33 GiB**
+  - On top of baseline you also get **3 IOPS per GB per Second** when you provision above 33.33 GB
+  - This means 100 GB volume gets you total 300 IO credits per second
+  - You only get baseline 100 IOPS if size of volume is below **33.33 GiB**
   
   #### Consuming IOPS
   
@@ -274,3 +274,191 @@
 - Remember snapshots only copy used data on the volume NOT allocated storage on the Volume. 
 - The data is incrementally stored which means doing a snapshot every 5 minutes will not necessarily increase the charge as opposed to doing one every hour.
 
+## EBS Encryption
+
+Unless the OS of EC2 instance is doing disk encryption, by default there is no encryption applied to EBS volumes
+
+EBS encryption can be turned on and it is applied to the volumes and snapshots at rest
+
+When you first create an EBS volume, EBS uses KMS and a Customer Master Key - This key could be the default AWS managed Customer Master Key called (AWS/EBS)  or it could be Customer Managed Key (CMK)  
+
+The CMK creates an encrypted Data Encryption key (DEK) that is stored with the volume on the physical disk. 
+
+This `DEK` can only be decrypted using KMS - assuming the entity trying to decrypt it has the permission to use KMS
+
+When EC2 instance is launched and you pick encryption, the KMS is requested to decrypt `DEK` and the decrypted key is stored on EC2 host in memory while it's been used. 
+
+At all other times it's stored in encrypted form on the EBS volume
+
+Every time the data is read or written to the volume, this decrypted `DEK` is used and at all times the data in the volume remains encrypted at rest 
+
+This means the data at rest is stored as **Ciphertext**
+
+If the EC2 instance is moved from this EC2 host, the key is then discarded, leaving the encrypted version on the physical storage of the volume. 
+
+If the instance needs to use this encrypted volume again, the `DEK` will needs to be decrypted by KMS and loaded into EC2 host
+
+If a snapshot is made of an encrypted EBS volume, the same data encryption key is used for that snapshot - meaning the snapshot is also encrypted.
+
+Anything volumes created from this snapshot uses the same `DEK` which means they are also encrypted
+
+Every time you create a new EBS volume from scratch, it creates a its own unique `DEK` data encryption key
+
+It doesn't cost anything to use - one of those things you should use by default 
+
+#### Exam PowerUp!
+
+AWS accounts can be set to encrypt EBS volumes by default.
+
+It will use the default CMK unless a different one is chosen which is the customer managed CMK
+
+As you know CMK itself can only encrypt 4 KB data, so it generates one `DEK` (Data Encryption Key) per volume that is then used to encrypt that volume or any future snapshots you take of that volume
+
+Can't change a volume to NOT be encrypted. 
+
+You could mount an unencrypted volume and copy things over but you can't change the original volume encryption status.
+
+The volume is encrypted using AES256 - this occurs between the EC2 host and EBS system. the OS does not see any encryption and there is no performance loss.
+
+If an exam question does not use AES256, or it suggests you need an OS to encrypt or hold the keys, then you need to perform full disk encryption at the operating system level. 
+
+You can perform full disk encryption on an unencrypted or encrypted EBS volume.
+
+Encryption at an EBS volume level is not related to full disc encryption inside the OS level - they both are different things.
+
+From performance perspective, EBS volume encryption is very efficient - you don't have to worry about the keys, it doesn't cost you anything and there is no performance loss for using it.
+
+OS level full disc encryption has a CPU performance penalty for encryption and decryption 
+
+
+
+## Network Interfaces, Instance IPs and DNS 
+
+An EC2 instance always starts with at least one Elastic Network Interface (ENI) 
+
+This is your Primary ENI but you can add one or more secondary ENIs to your instance which can be in separate subnets but they all have to be in the same AZ as your instance.
+
+When you launch an instance with Security Groups, they are on the network interface and not the instance.
+
+#### Elastic Network Interface
+
+Has these properties
+
+- MAC address - Hardware address of interface visible in OS
+- Primary IPv4 private address
+  - From the range of the subnet the ENI is within.
+  - 10.16.0.10 will be static and not change for the lifetime of the instance
+  - Given a DNS name that is associated with this private address
+    - ip-10-16-0-10.ec2.internal
+    - only resolvable inside the VPC and always points to private IP address
+- 0 or more secondary private IP addresses
+- 0 or 1 public IPv4 address given two ways
+  - Instance must manually be set to receive an public IPv4 address
+  - Default settings into a subnet which automatically allocates an IPv4
+  - This is a dynamic IP that is not fixed
+  - If you stop an instance the address is deallocated.
+  - When you start up again, it is given a brand new IPv4 address
+  - Restarting the instance will not change the IP address
+  - Changing between EC2 hosts will change the address
+  - They are allocated a public DNS name.
+  - Public DNS name will resolve to the primary private IPv4 address of the instance
+  - Outside of the VPC, the DNS will resolve to the public IP address.
+  - Allows one single DNS name for an instance, and allows traffic to resolve to an internal address inside the VPC and the public will resolve to a public IP address.
+- 1 elastic IP per private IPv4 address
+  - Elastic IP addresses are public IPv4 address
+  - These are different than normal public IPv4 address.
+  - you can have one Public IPv4 are per instance but you can have one public elastic IPv4 per private IP address on the network interface card
+  - Elastic IP addresses are allocated to your AWS account 
+  - Can associate elastic IP with a private IP either on the primary interface or on the secondary interface.
+  - **EXAM** - If you associate elastic public IPv4 with primary interface, the normal(non-elastic) IPv4 address will be lost and the elastic IPv4 becomes instance's new public IPv4.  If you remove elastic-IP from the instance, it will gain a new IPv4 address but you won't get the initial public IP which you removed by  associating elastic IP to that network interface.
+- 0 or more IPv6 address on the interface
+  - These are by default public addresses
+- Security groups
+  - applied to network interfaces
+  - will impact all IP addresses on that interface
+  - if you need different IP addresses impacted by different security groups, then you need to make multiple interfaces and apply different security groups to those interfaces
+- Source / destination checks
+  - if traffic is on the interface, it will be discarded if it is not from going to or coming from one of the IP addresses
+
+Secondary interfaces function in all the same ways as primary interfaces except that you can detach them  and move them to other EC2 instances.
+
+#### Exam Power Ups
+
+Legacy software is licensed using a mac address. If you provision a secondary ENI to a specific license, you can move around the license to different EC2 instances.
+
+Multi homed (subnets) management and data - so an instance with an ENI in two different subnets. You can use one for Data and one for management.
+
+Different security groups are attached to different interfaces - that's why you might want to have multiple network interfaces rather than multiple IPs on primary ENI.
+
+The OS doesn't see the IPv4 public address. this is provided by NAT which is performed by Internet Gateway. 
+
+You always configure the private IPv4 private address on the interface.
+
+Never configure an OS with a public IPv4 address.
+
+IPv4 Public IPs are Dynamic, starting and stopping will kill it
+
+Inside VPC, public DNS for a given instance will resolve to the primary private IP address. If you have instance to instance communication within the VPC, it will never leave the VPC. It does not need to touch the internet gateway.
+
+Outside VPC, the public DNS is resolved to public IPv4 address on the instance
+
+## Amazon Machine Images (AMI)
+
+- AMI's can be used to launch EC2 instance.
+
+- Images of EC2.
+
+- When you launch an EC2 instance, you are using an Amazon or community provided AMI.
+- you can also launch EC2 instance using Marketplace (can include commercial software) provided AMIs
+  - Will charge you for the instance cost and an extra cost for the AMI
+- Regional, unique ID
+  - ami-`random set of chars`
+  - you will have different AMI IDs for the same distribution of an OS in different regions
+- Controls permissions
+  - Default only your account can use it
+  - Can be set to be public - so everybody can access it
+  - Can have specific AWS accounts on the AMI
+- Can create an AMI from an existing EC2 instance to capture the current config
+
+#### AMI Lifecycle
+
+**Launch**
+
+EBS volumes are attached to EC2 devices using block IDs
+
+- BOOT /dev/xvda
+- DATA /dev/xvdf
+
+**Configure**
+
+- Can customize the instance from application installation to attaching specific  volume sizes to meet your needs
+
+**Create Image**
+
+- Once it has been customized, an AMI can be created from that
+- AMI contains:
+  - Permissions: who can use it
+  - EBS snapshots are created from attached volumes when you create AMI from EC2 instance
+    - Block device mapping links the snapshot IDs and a device ID for each snapshot.
+    - this means the block device mapping will have the snapshot and device ID listed
+    - so when launching a new instance using the AMI, we'll have the exact same volumes attached the the new instance
+
+**Launch**
+
+When launching an instance, the snapshots are used to create new EBS volumes in the availability zone of the EC2 instance and contain the same block device mapping.
+
+#### 
+
+#### Exam Powerups
+
+AMI can only be used in one region 
+
+AMI Baking: creating an AMI after configuring an EC2 instance with your desired settings.
+
+An AMI cannot be edited. If you need to update an AMI, launch an instance with it, make changes to the configuration and then then make new AMI 
+
+Can be copied between regions. 
+
+Remember permissions by default are your account only but you can add a specific AWS account to use it or you can make your AMI public
+
+Billing is for the storage capacity for the EBS snapshots that AMI references
