@@ -447,8 +447,6 @@ EBS volumes are attached to EC2 devices using block IDs
 
 When launching an instance, the snapshots are used to create new EBS volumes in the availability zone of the EC2 instance and contain the same block device mapping.
 
-#### 
-
 #### Exam Powerups
 
 AMI can only be used in one region 
@@ -462,3 +460,130 @@ Can be copied between regions.
 Remember permissions by default are your account only but you can add a specific AWS account to use it or you can make your AMI public
 
 Billing is for the storage capacity for the EBS snapshots that AMI references
+
+## Instance Billing Model
+
+There are three main pricing models for EC2 instances
+
+#### On-Demand Instances
+
+**KEY: Most expensive among the three billing model - highly available**
+
+- Hourly rate based on OS, size, options, etc - When instance is in running state
+
+- Billed in seconds (60s min) or hourly
+
+  - Depends on the OS
+
+- Default pricing model
+
+- No long-term commitments or upfront payments
+
+- Great starting point for new apps or apps with uncertain requirements
+
+- Short-term, spiky, or unpredictable workloads which **can't tolerate any disruption**.
+
+- Exam tip, something that can't tolerate disruption or uncertain usage, can't commit or pay upfront then go with on-demand billing model for EC2
+
+  
+
+#### Spot Instances
+
+**KEY:** (**Risk of termination - up to 90% off on-demand**)
+
+Up to 90% off on-demand pricing 
+
+spot pricing is how AWS sell their spare EC2 capacity
+
+price you pay is based on the amount of spare capacity of that particular instance type in a particular region and AZ
+
+AWS set a spot price which changes depending on their spare capacity levels
+
+You can set a maximum hourly rate you are willing to pay for certain type and size of EC2 instance in a certain AZ in a certain region. 
+
+If the max price you set is above the spot price, then you pay only that spot price for the duration you consume that instance - this could be much lower than on-Demand price
+
+As the spot price increases, you'll keep paying the max spot price you set until the price goes above your max spot price. At that time, the instance will be terminated. 
+
+it's great for:
+
+-  any scenario that can tolerate the risk of termination and can continue later
+- apps that have flexible start and end times
+- apps that only make sense at low cost
+- you should not use it for single, primary web server - email or file server. 
+- Cheapest method to get access to EC2 only if your app can handle sudden termination
+
+
+
+#### Reserved Instance
+
+**KEY:** (**Requires commitment -up to 90% off on-demand**)
+
+Up to 75% off on-demand in exchange for a commitment. 
+
+You're buying capacity in advance for 1 or 3 years. You will pay regardless of instance running or not. 
+
+Flexibility on how to pay
+
+- All up front - Whole one or three years
+- Partial upfront
+- No upfront
+
+Best discounts are for 3 years all up front - most expensive is no upfront. 
+
+Reserved in region, or AZ with capacity reservation  -  you can also specify AZ which is known as zonal reservation. This locks you to AZ in that region and reserves capacity and it makes you priority over on-demand if there is any capacity issue in that AZ.
+
+Can perform scheduled reservation when you can commit to specific time windows. Like certain hours every day when have high demand or data processing at certain times. You pay reduced rate in that time window
+
+Best used for:
+
+- If you have a known stead state usage, email usage, domain server. Cheapest option with no tolerance for disruption.
+- if you want best price with reserved capacity in an AZ for a business critical apps
+
+you can mix match any of three pricing models depending on your needs. 
+
+
+
+**Dedicated hosts** - This is a technical architecture difference, that carry some other cost - there will be a dedicated lesson on this elsewhere but this is not an instance Billing Model like the other three. 
+
+### Instance Status Checks and AutoRecovery
+
+Every instance has two high level per instance status checks
+
+#### System Status Checks
+
+Failure of this check could indicate software or hardware problems of the EC2 service or the host.
+
+Performs two separate tests - if either one of them fails this means you have a problem
+
+First is the **system status** second is **Instance status**
+
+Failure of system status check means:
+
+-  loss of system power
+- loss of network connectivity
+- host software issues
+- host hardware issues
+
+Failure of instance status:
+
+- corrupt file system
+- incorrect instance networking
+- OS kernel issues
+
+to fix it , you can either try to manually restart instance or use auto recovery that moves the instance to a new host with same configuration 
+
+#### Create Status Check Alarm
+
+This feature has four options
+
+- Recover this instance: this uses the auto recovery feature of EC2.  can be a number of steps depending on the failure. Could migrate to a new host. Won't be able to protect you if entire AZ fails as EC2 is an AZ service. requires space capacity in that AZ. you also need modern type of EC2 instance to use this feature. only works with EBS volumes attached - doesn't work with instance store volume. 
+
+- Stop this instance
+
+- Terminate this instance: useful in a cluster
+
+- Reboot this instance
+
+  
+
