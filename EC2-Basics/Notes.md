@@ -546,7 +546,9 @@ you can mix match any of three pricing models depending on your needs.
 
 **Dedicated hosts** - This is a technical architecture difference, that carry some other cost - there will be a dedicated lesson on this elsewhere but this is not an instance Billing Model like the other three. 
 
-### Instance Status Checks and AutoRecovery
+
+
+## Instance Status Checks and AutoRecovery
 
 Every instance has two high level per instance status checks
 
