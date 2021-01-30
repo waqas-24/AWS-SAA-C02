@@ -589,3 +589,66 @@ This feature has four options
 
   
 
+## Horizontal and Vertical Scaling
+
+#### Vertical Scaling
+
+As customer load increases, the server may need to grow to handle more data. 
+
+When you are doing vertical scaling with EC2, you are actually resizing EC2 instance. Because of this, there is a downtime - Each resize requires downtime (Disruption)
+
+Even though AWS always updating their hardware but there is also an upper cap on EC2 instance. (Instance Size)
+
+Often times vertical scaling can only occur during planned outages. 
+
+Larger instances also carry a $ premium compared to smaller instances. 
+
+There is an upper cap on performance - instance size. No application modification is needed. 
+
+Works for all applications, even monoliths. If your app can work on one instance3 it can also work on vertically scaled instance. No app modification required
+
+#### Horizontal Scaling
+
+Instead of increasing the size of one instance, in horizontal scaling you add  more instances
+
+as the load is increased, you add more capacity in terms of number of instances
+
+As the customer load increases, this adds additional capacity.
+
+Instead of one running one copy of an application, you can have multiple copies running on each compute instances. this means that they all need to work together. 
+
+This requires a load balancer. Load balancer is an appliance that sits between customers and your instances. When customers attempt to access the system, the incoming load is distributed across all of the instances running your app.
+
+Each instance gets fair amount of load and for every mouse click/interaction by customer could be on same instance or randomised across any available instances. 
+
+Sessions are everything with horizontal scaling. With horizontal scaling you can shift between instances equally. This requires either application support or **off-host sessions**. This means the instances are **stateless and the app stores session data elsewhere. 
+
+it requires thought and design so your application can support it but if your application does support it then you get all of the benefits:
+
+- No disruption while scaling up or down.
+- No real limits to scaling.
+- Uses smaller instances so you pay less, allows for better granularity.
+
+## Instance Metadata
+
+Instance Metadata is an EC2 service that is provided to instances
+
+it's data about the instances that can be used to configure or manage a running instance 
+
+it's accessible inside ALL instances
+
+The IP address 169.254.169.254 to access instance meta data. 
+
+**Memorize**  ==>> http://169.254.169.254/latest/meta-data/
+
+Meta data allows anything that's running on the instance to query it for information about that instance and that info is divided into categories
+
+- for example hostname, events, security group etc all information about the environment. 
+
+- networking related information is a big use case for meta data
+- authentication information
+  - instances can be used to gain access on other AWS services by assuming the roles 
+- user-data
+- **NO AUTHENTICATION or ENCRYPTED**
+  - Anyone who can gain access to the instance will be able to get access to meta data
+  - Can be restricted by local firewall by blocking access to 169.254.169.254 IP but that an extra per instance admin overhead. 
