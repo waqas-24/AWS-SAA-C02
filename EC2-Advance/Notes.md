@@ -168,3 +168,83 @@ There are three types of Placement Groups for EC2:
      - not supported for dedicated hosts
      - USE Case: for apps that need to be topology aware HDFS, HBASE and Cassandra
 
+## Dedicated Hosts
+
+You can have dedicated EC2 host to yourself
+
+you pay for the EC2 host and don't have to pay for the instances inside that EC2 host
+
+You can get it on-Demand or reserve it for 1 to 3 years period
+
+The hardware for dedicated host has sockets and cores. If you are running a licensed software that based on number sockets or cores - you can use the dedicated EC2 host sockets and cores for the license and then you can create as many instances as you like within that EC2 host. 
+
+some enterprise software are sold based on socket/number of cores. So if you have a small EC2 instance in an EC2 host, you will be paying for the physical socket/cores on that host even though you are not consuming all that capacity as you are only running a small EC2 instance on that host.
+
+You can only get specific family of instances with dedicated hosts for example if you have 1 Socket with 16 Cores, you can get:
+
+16 x medium instances
+
+8 x Large instances
+
+4 x xlarge instances
+
+2 x 2xlarge instances
+
+1x 4 large instance
+
+With the new Nitro based dedicated hosts, you have more flexibility. If you have 2 Sockets with 48 Cores:
+
+1 host can have:
+
+1  x 12 xl  
+
+1 x 4xl
+
+4 x 2xl
+
+and another one can have
+
+4 x 4 xl
+
+4 x 2 xl
+
+**Limitations**
+
+These are not supported in Dedicated Hosts:
+
+- AMI Limits - RHEL, SUSE Linux, Windows AMIs
+- Amazon RDS
+- Placement Groups
+
+Dedicated hosts can be shared with AWS account using RAM(Resource Access Manager) product
+
+**Use Case**
+
+You use dedicated hosts mostly for software licensing that use number of sockets/cores for licensing
+
+## Enhanced Networking and EBS Optimised
+
+**Enhanced Networking**
+
+- It uses SR-IOV Network interface card. It's a special NIC that is aware of virtualisation. One physical SR-IOV can have many logical NIC that attached to EC2 instance
+- Without SR-IOV the instance communicated to the physical NIC that's attached to the EC2 Host where the EC2 host has to translate which instance is trying to communicate to the NIC. This is handled via software and it consumes CPU cycles
+- With SR-IOV logical NIC no translation is required which in return you get:
+  - higher I/O 
+  - lower host CPU usage 
+  - More Bandwidth
+  - Higher Packets-per-seconds(PPS)
+  - consistent lower latency
+- It is available by default and  does not cost you extra - pretty much available for most modern EC2 instance types
+
+**EBS Optimised**
+
+- Most Instances come with Optimised EBS by default - disabling it might not cause any difference as the hardware now comes with this feature built in
+- for some older hardware it is also supported but enabling it will cost extra
+- EBS optimised means dedicated storage for EBS
+- historically the network was shared between data and EBS. this caused lower performance for both data and EBS - since EBS is just a block storage connected to instance via network
+- EBS optimised means that at network level some optimisation has occurred and a dedicated storage capacity is provided to EBS - meaning faster speeds possible with EBS and data transfer over the network 
+
+
+
+
+
