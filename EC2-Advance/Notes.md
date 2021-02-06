@@ -77,3 +77,94 @@ So your app inside EC2 instance will always have valid credentials every time it
 **Credentials Precedence**
 
 https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-precedence
+
+## SSM Parameter Store
+
+It's an AWS service that allows you to store important data such as database password, license codes or an app password or configuration settings.
+
+Rather than using User data which is accessible to anyone who has access to EC2 instance, or storing passwords or other important information in a persistent disk, it's better to use this service.
+
+It can store strings, documents, and secrets in the form or parameters. You have parameter name and its value and the value is where you store important data. 
+
+Many AWS services have strong integration with SSM Parameter Store. You can use it via Cloudformation or EC2 instance CLI tool
+
+You can store three different types of parameters:
+
+- String
+- StringList
+- SecureString
+
+Parameter stores also supports hierarchical structure and versioning. You can save parameter as plain text (DB String) or as ciphertext using KMS. 
+
+SSM is very flexible in terms of permissions, you can either create a tree branch and give access to one team so they can store all the passwords they need or you can give access to a branch tree for a specific application
+
+Any change they occurs to any parameter can trigger events 
+
+You can also store parameter as public so every can have access to that(Latest Amazon Linux AMI name)
+
+Access:
+
+- Via IAM User (long term credentials)
+- Via IAM Role (Temporary credentials)
+- if parameters are encrypted then access to KMS is also needed
+
+## System and Application Logging on EC2
+
+Although CloudWatch and CloudWatch Logs are great way to monitor EC2 instance metrics and logs from the outside but sometimes you need to create logs based on what's happening inside the EC2 instance
+
+To see what's happening inside EC2 instance CloudWatch Agent can be used that can send OS-Visible data to CloudWatch or CloudWatch Logs
+
+You will need to setup some configuration and permissions for CloudWatch Agent 
+
+We can install CloudWatch Agent manually, setup configuration and start logging or we can automate this via Cloud formation. We can also use Parameter store to store CloudWatch agent configuration and we'll also need to have a role that has permissions to CloudWatch Logs that can be attached to EC2 instance
+
+The metrics and logs we want to capture in instance are all stored via log groups:
+
+- one log group for each log file
+- Within each log group there will be a stream for each instance
+
+##     EC2 Placement Groups
+
+When you provision an EC2 instance in an AZ, it's up to AWS to decide which EC2 host should give you the EC2 instance you have no say in this. But with Placement Groups you can influence this decision. You can tell AWS if you want two EC2 instance to be close to each other or be away in that AZ
+
+There are three types of Placement Groups for EC2:
+
+1. Cluster - to make sure physical hardware of EC2 instances are close together - belong to 1 AZ
+   - Highest level of performance inside EC2 - super low latency - max number of packets
+   - Best practice: You first create the group and provision same size instances at the same time to avoid capacity issues. 
+   - We'll have same rack - sometimes potentially same EC2 host
+   - 10 GBPs single stream (you usually get 5 GBPs)
+   - Little to no resilience - since they are physically close - if the hardware fails - they could all go down
+   - EXAM 
+     - ONE AZ ONLY
+     - Can span VPC peers with some performance hit
+     - Not all instance are supported in cluster placement group
+     - Best practice - use same instance type but this is not necessary
+     - Best practice to launch all instances at the same time to potentially avoid capacity issues but not necessary
+     - Cluster group placement you can achieve 10 Gbps single stream performance
+     - Use Case: Performance, fast speeds, low latency
+2. Spread -  keeps your EC2 instances to be spread in AZ (inverse of cluster) - ensuring instances using different hardware
+   - Use Case: Max amount of availability and resilience
+   - can span multiple AZ - Instance in this group are placed in isolated hardware in each AZ
+   - each have their own electricity and networking - meaning if networking or electricity fails then the failure could be isolated
+   - EXAM:
+     - High availability and resilience - each instance runs from a different hardware rack
+     - 7 instances per AZ is a hard limit 
+     - This is not supported for dedicated instances or hosts
+     - Use Case: critical instances that needed to be kept separated to ensure faults are isolated
+     - managed by default by AWS 
+
+3. Partition - designed for distributed computing - Ensuring groups of instances spread apart - each group has different hardware
+   - You define how many partitions you need per AZ - Max you can have is 7 partition per AZ
+   - unlike Spread Placement group where you can have max 7 instances per AZ, here you can have as many instances as you like per **partition**.
+   - You can either allow AWS to decide which instance goes to which partition or you can decide yourself
+   - each partition is physically isolated with other and has it's own power and networking.
+   - if the hardware of one partition fails then only that partition is impacted
+   - you can see which instances is in which partition and you can use this info for topology-aware applications, HDFS, HBASE and Cassandra. These apps can use this info to optimise their replications 
+   - Use Case: Large scale systems where you have groups of instances 
+   - **EXAM**:
+     - 7 partitions per AZ
+     - instances can be planked in specific partition or you can let AWS decide(auto placed) 
+     - not supported for dedicated hosts
+     - USE Case: for apps that need to be topology aware HDFS, HBASE and Cassandra
+
