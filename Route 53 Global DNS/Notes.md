@@ -187,21 +187,29 @@ if you are doing any work that involves changing DNS records then it's best to r
 - From your PC you go to your ISP resolver then root servers then .org TLD that contains NS records that point to NS servers in R53
 - There is a monthly cost for hosting this public hosted zone as well as you will have to pay for the number of times this hosted zone is queried
 
+## R53 Private Hosted Zones
 
+- Private hosted zone is just like public except its only available inside a VPC in AWS
+- you can associate private hosted zone in AWS using UI Console, CLI or API
+- you can also associate Private Hosted zone in different AWS accounts using CLI or API only
+- SPLIT-VIEW: you can have public and private hosted zone of the same name. This means when someone from the pub internet tries to access a web site they will be presented with publicly hosted zone but if someone tries access the same name inside AWS, they will be directed to private hosted zone. 
 
+## CNAME vs R53 Alias
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-## R53 Public Hosted Zones
-
+- CNAME maps a name to another name
+- For example, you can have a CNAME  www.google.com maps to google.com
+- It's a way to create an alternative name in DNS.
+- The problem is you can't use CNAME for Naked domain name. Named domain is also called apex of a domain
+- it's a domain name without www at the start
+- so you can't have google.com pointing to something else
+- Alias om AWS fix this problem. With alias you can point to something using apex of a domain/naked domain
+- you can still continue to use CNMAE for www records
+- ALIAS records map a NAME to an AWS resource
+- it can be used for naked/apex as well as normal records
+- for www.google.com you can use either CNAME or ALIAS
+- for naked/apex domains you have to use ALIAS records if you want to point to an AWS resources
+- There is no charge for ALIAS requests pointing at AWS resources
+- EXAM: Remember to use ALIAS by default for pointing naked/apex domain for AWS resources
+- ALIAS is a subtype - you can have an A record ALIAS meaning an IP address or CNAME record ALIS meaning a name. such as ELB load balancer name
+- ALIAS is an AWS naming convention - it's only usable in Route 53 and outside in normal DNS it's not usable
+- you need an ALIAS record for AWS services such as API Gateway, CloudFront, Elastic Beanstalk, ELB, Global Accelerator and S3
