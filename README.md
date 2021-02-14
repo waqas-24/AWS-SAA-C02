@@ -10,7 +10,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 [3 Advanced EC2](#3-Bootstrapping-EC2-using-User-Data)
 
-[4 Domain Name Service (DNS) Fundamentals](#4-Domain-Name-Service-(DNS)-Fundamentals)
+[4 Domain Name Service (DNS) Fundamentals](#4-Domain-Name-Service-DNS-Fundamentals)
 
 ## 1 Elastic Block Store EBS Service Architecture 
 
