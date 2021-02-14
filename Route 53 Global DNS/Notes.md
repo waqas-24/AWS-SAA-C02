@@ -213,3 +213,166 @@ if you are doing any work that involves changing DNS records then it's best to r
 - ALIAS is a subtype - you can have an A record ALIAS meaning an IP address or CNAME record ALIS meaning a name. such as ELB load balancer name
 - ALIAS is an AWS naming convention - it's only usable in Route 53 and outside in normal DNS it's not usable
 - you need an ALIAS record for AWS services such as API Gateway, CloudFront, Elastic Beanstalk, ELB, Global Accelerator and S3
+
+## Route 53 Simple Routing
+
+One of the simple routing policies available in Route 53 is called Simple Routing
+
+Lets say we have a hosted zone called animal4life.org and with simple routing you can have one record per name 
+
+For example WWW which is an A record type. As you know A record returns an IP address. With Simple routing you can have one or more than one IP address assigned to one WWW records. All IP addresses are returned by the query in random order
+
+Simple routing does not support health check - meaning it doesn't check the IP address it's pointing is operational or not but simple routing is fairly easy to setup and manage. 
+
+all other forms of routing policies in route 53 offer some form of health check on the pointed location. 
+
+## R53 Health Checks
+
+Health checks are different from records - they are a setup and configured separately
+
+Health Checkers are used to check health of something and they are distributed globally
+
+ Health checkers are not limited to AWS - you can check anything over the public internet - you only need an IP address and Check occur every 30 seconds by default but at an additional cost you can increase it to 10 sec
+
+You can do the following checks:
+
+- TCP
+  - this needs to be successfult within 10 seconds
+- HTTP/HTTPS 
+  - More useful for Web application then a simple TCP check
+  - Route 53 should establish TCP connection with endpoint within 4 seconds and the end point should respond with HTTP status code in the  200 or 300 range within 2 seconds after connecting
+- HTTP/HTTPS String Matching check (Most accurate health check)
+  - Same as above but once route 53 receive the status code it must also receive the response body within 2 seconds. Route 53 checks the response body for strings that you specified. 
+  - the string should be in the first 5120 bytes of the response body else the target server fails the health check
+
+Based on the results your target servers can be declared Healthy or Unhealthy
+
+**Checks Types**
+
+- Endpoint - simply checking a server
+
+- CloudWatch Alarm - it would reach to CloudWatch alarms configured separately and can contain some in OS or in-app tests if CloudWatch agent is used
+
+- Check of Checks (Calculated) - you can setup application wide health check with individual components
+
+
+## Failover Routing
+
+With Failover Routing if the primary address isn't working then you will be redirected to the secondary address potentially hosted by a different machine.
+
+We can use "out of band" failure/maintenance page for our website in case the primary address is not working
+
+The health check generally occurs on the primary resource but if it fails then the secondary records of the same address sis returned
+
+You use this to route traffic to a resource when it's healthy but if it's unhealthy then you want ot route to a difference address for the same resource
+
+## Multi Value Routing
+
+it's a bit of a mixture between fail over and simple routing
+
+With Multi Value Routing you can create many records with the same name - For example you can create many WWW A records that map to different IP addresses
+
+Up to 8  healthy records are returned to the DNS client when queried - If you assign more than 8 IP addresses than 8 randomly selected records are returned
+
+Any records with failed health check won't be returned
+
+This is not an alternative to a load balancer that handles session based data but to be able to return multiple healthy IP addresses to server the request improves availability of application 
+
+**Simple Routing vs Failover vs Multi Value Routing**
+
+- Simple routing only links one resources such as a web server and doesn't not support health checks
+- Failover is used if your main application is down so you can redirect user to another page(possibly S3 bucket Status Website) 
+- Multi Value is used when you have many resources that can server the request and they all can be health checked
+
+## Weighted Routing
+
+This is like a simple form of load balancing or when you want to test new version of Software
+
+lets say you have 3 WWW A records and with weighted routing you can assign weight against each record
+
+so lets say you weight records like this:
+
+WWW 40 A 1.2.3.3
+
+WWW 40 A 1.2.3.4
+
+WWW 20 A 1.2.3.5
+
+the top record will be returned 40 % of the time
+
+Same is true for the middle record but the last record will be returned only 20 % of the time
+
+If you set a weight to 0 that means that record is never returned but if you set all records to 0 then all of them are returned
+
+If a record becomes unhealthy then the process of selection is repeated until a healthy record is selected
+
+Unhealthy record doesn't cause any changed in the weightage
+
+## Latency-Based Routing
+
+it should be used when you what high performance and good user experience
+
+with latency-based routing you can assign regions such as us-east-1
+
+Latency-based routing supports one record with the same name in each AWS region
+
+So AWS maintains a database with users source, destination location and latency
+
+So when a user requests a record for example, from AUS then the record that's tagged with ap-southeast-2 is returned since that would provide the lowest latency based on the AWS latency database
+
+Latency based routing can also be combined with health checks. If a record is unhealthy then the next record with lowest latency will be returned
+
+## Geolocation Routing
+
+With geolocation routing instead of latency the user's geo location and resources locations are used to influence address resolution
+
+It's like a lookup where you create a record and tag it with state(in case of US), country, continent or with default
+
+So if user location match with the tagged record, the record is delivered. if it doesn't match then the record is not delivered at all. This means the user is delivered location based resource. 
+
+IP checks verify location of the user (depending on the DNS system, it could be resolver or the user directly)
+
+so once you have the user location then state check is done - if a record is found with the same state then then the record is returned and the process stops. If not then the country is checked, if not found then the continent  is checked. If not of the records mast with the user locating then the default record is returned. 
+
+**EXAM**: Remember with geo location, nearest record to user is not returned but those that match to user location is returned. This means you can do regional restrictions, language specific content or load balancing across regional endpoint.
+
+## Geoproximity Routing
+
+it provides records that are as close to your customer as possible
+
+With latency based routing you the customer is provided record that is close to their region bases on estimated latency but with Geoproximity it provides records by calculating distance from customer and has some other benefits
+
+with geoproximity, you provide the region name in case of AWS resource but it f it's an external resource you provide longitude and latitude coordinates - you also define a bias
+
+lets say we have three resources, one in US, another in UK and a third one in Australia. Lets say someone from KSA needs to access these resources. Since there isn't any resource in Saudia arabia and the closest location from Saudia is UK so the record in UK will be delivered. 
+
+you can change this decision by adding a bias. With bias you can define which geo locations should be served by which resource. So you can move the traffic coming from KSA to Australia instead. 
+
+This means, rather than using actual physical distance between the user and resource, you can introduce a bias to influence the traffic to a certain location/resource. With plus you can increase the area for a resource to serve - so you can increase the bias for UK to server the whole of Europe and for Australia to serve the whole of Asia.
+
+## R53 Interoperability
+
+R53 provides two functions:
+
+1- Register a domain for you 
+
+- AWS has relationships with key TLD companies to register domain
+- you pay AWS to register a domain main for you  - AWS contacts the TLD company that manages DNS for the TLD. For example for .org PIR manages the DNS.
+
+2- Host Domain for you
+
+- AWS can also host the domain for you by storing hosted zones in 4 server
+- If you register domain via R53 and also want to host the domain then R53 will send NS records for 4 servers to TLD 
+
+if you like you can also register your domain via thirst party such as godaddy and then host your domain in R53 by creating a public hosted zone and you will need to provide the TLD NS records via godaddy.com
+
+if you like you can also just register domain via r53 but host your domain via 3rd party such as godaddy- this is rarely happen but this is something you can also do. In this case you can use r53 to provide the hosted domain details to TLD
+
+EXAM: Key thing to remember is that r53 provides two separate roles. One is to register a domain on your behalf - Second to host the domain in r53. If you want  you can do either one of them and use 3rd party to do the second bit.
+
+
+
+​	
+
+
+
