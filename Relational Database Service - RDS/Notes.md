@@ -100,11 +100,47 @@ but with graph database the relationships are stored with the data so it's but f
 
 Use Case: Social Media - Complex relationships
 
+## ACID vs BASE
 
+ACID and BASE are mechanisms to access database.
 
+**CAP Theorem**
 
+- Consistency
+  - The queried data from database will always be consistent and most recent otherwise you will get an error
+- Availability
+  - it means that even if the data is not consistent you will always get an answer from the database 
+  - You won't get an error even if certain portion of your database is going through a failure but without the guarantee that the data will be consistent/most up to date
+- Partition Tolerance(resilience)
+  - This means that the database system can be made of multiple network partitions
+  - the system will continue to function even if there are errors in some of nodes 
 
+The CAP theorem says that any database system is able to deliver any of the two of these factors
 
+ACID = Consistency
+
+BASE = Availability
+
+ACID = Atomic Consistent Isolated Durable
+
+EXAM: ASID = RDS databases = Relational Database Systems - ACID limits the ability of a database to scale
+
+- ATOMIC = either all or no part of transaction successful
+- CONSISTENT = When a transaction happens, the database moves from one state to another - nothing in between
+- ISOLATED = multiple transaction occurring at one time do not interfere. multiple transaction are executed in a way as if they were executed sequentially
+- DURABLE = Once transactions are executed successfully, they become durable. Power outage  or crashes don't hard the successful transaction
+
+Most relational databases use ACID based transaction models - these are rigid databases used mostly by financial system and limit scalability 
+
+BASE = NoSQL Models = Basically Available - Soft State - Eventually Consistent
+
+- Basically Available -Read/Write are usually available but without consistent guarantee. Rather than focusing on consistency they tend to spread/replicate data to multiple nodes. It tries to be best with consistency but there are no guarantees
+- Soft State - The database itself isn't guaranteed to be consistent so developers/applications have to somehow figure out consistency on their own
+- Eventual  Consistency - If we wait long enough the reads from the system will be consistent
+
+It just means that when you are reading via BASE modelled database, you will not necessarily get the most up to date write. You will eventually get the write you want want but it might take some time and is not guaranteed. So you as a developer have you have an awareness of this
+
+DynamoDB is NoSQL but Dynamo DB also offers ACID based model called DynamoDB Transactions
 
 
 
