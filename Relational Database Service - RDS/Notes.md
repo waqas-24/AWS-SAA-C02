@@ -142,9 +142,79 @@ It just means that when you are reading via BASE modelled database, you will not
 
 DynamoDB is NoSQL but Dynamo DB also offers ACID based model called DynamoDB Transactions
 
+## Databases on EC2
 
+it's usually considered a bad practice to run a database in an EC2 instance 
 
+Architecturally speaking you might have just one big EC2 instance and run Database, application and Webserver on the same instance.
 
+Or you might setup your database in a separate EC2 instance in one AZ and another instance with Application and Webserver in another AZ. Now that you have your system spread into two AZ bear in mind that there is a cost associated when transferring data between AZs
+
+**Why you might want to do this...**
+
+- You might need OS level access on the Database EC2 instance (OS level access is rarely required)
+- advanced database tuning/optimisation - this can only be done via Database root level access - often not required but advance managed DB systems do provide many of these tuning parameters
+- it's usually vendor that requests this level of access but not what your business might need
+- you might want to run a database version that AWS doesn't provide
+- specific OS/Database combination that AWS doesn't provide
+- some sort of architecture that AWS doesn't provide (resilience/replication)
+- Sometimes you just want your own EC2 instance without much justification
+
+**Why you shouldn't do this...**
+
+- Admin Overhead - managing EC2 and DBHost
+- Backup / DR Management 
+- If you use EC2 you are bound to the AZ EC2 is in - if that AZ fails your database fails 
+- Features - some of AWS DB products are amazing
+- EC2 is ON or OFF - no serverless, no easy scaling
+- Replication - skills, setup time, monitoring and effectiveness
+- Performance... AWS managed DB are highly optimised and features rich to support high level performance
+
+## Relational Database Service (RDS)
+
+it's a Database as a service (DaaS) product. To be more precise you can call it DatabaseServer-as-a-service
+
+What you get is a managed database instance and within it, you can have one or many databases
+
+AWS handles all the admin overhead, so you don't have to worry about patches, physical hardware, or server OS or the Database system itself
+
+With RDS you can have pretty much all the popular database you can think of such as:
+
+- MySQL
+- MariaDB
+- PostgreSQL
+- Oracle
+- Microsoft SQL Server
+
+you can pick whichever database instance you need. They all come with their own features and limitations. So you should be aware of those. No need to understand that in detail for the exam.
+
+You can also have amazon's own Aurora database system with RDS but it's soo different then those mentioned above so we'll discuss it separately
+
+**Architecture**
+
+- DB instance
+  - When you provision the database instance you get one database with it
+  - but you can create more databases within this instance later on
+  - These will be called user created databases
+- Once you have created a database, you access it using database host-name, a **CNAME**
+  - this is the only wat to connect to database - you can't use IP address to connect to database 
+- You can use the same tools you would use to access the RDS database like you would use for same database self managed in an EC2 instance. For example sql developer or DBeaver
+- comes in various types and sized(CPU and Memory) but with prefix db
+  - db.m5 - general purpose
+  - db.r5 - memory optimised
+  - db.t3 - burst instance type
+- Comes with single or multi-AZ (two instances work together to provide failover support)
+- when you provision rds instance you also allocate the dedicated storage to that instance
+  - the storage is just a block storage - it's essentially EBS storage which is also located in the same AZ as the instance 
+  - The dedicated EBS storage could be:
+    - io1 - high end performance - lots of IOPS and consistent low latency
+    - gp2 - usually the default
+    - Magnetic - not usually the default but it's available if your setup is historically used magnetic type storage
+- Billing 
+  - RDS instance hourly rate for the compute the instance on (CPU/Memory)
+  - GB/month - billed for the amount of storage allocated for RDS - just like EC2 EBS volume if you allocate 50GB then you will be charged for 50 GB per month.
+- Security 
+  - Access to RDS instance is controlled by the security group that's attached to RDS instance
 
 
 
