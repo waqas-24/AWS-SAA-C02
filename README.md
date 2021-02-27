@@ -4,7 +4,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 **Table of Contents**
 
-[01 Elastic Compute Cloud - Basics](#01-Elastic-Block-Store-EBS-Service-Architecture)
+[01 Elastic Compute Cloud - Basics](#01-Elastic-Compute-Cloud-Basics)
 
 [02 Introduction to Containers](#02-Introduction-to-Containers)
 
@@ -18,7 +18,9 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 [07 High Availability and Scaling](#07-High-Availability-and-Scaling)
 
-## 01 Elastic Block Store EBS Service Architecture 
+## 01 Elastic Compute Cloud - Basics
+
+## Elastic Block Store EBS Service Architecture 
 
 
 - EBS provides block ***storage*** in the form of volume – these volumes can be encrypted via KMS
