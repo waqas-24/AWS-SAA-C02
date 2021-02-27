@@ -12,7 +12,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 [04 Domain Name Service (DNS)](#04-Domain-Name-Service-DNS)
 
-[05 Relational Database Service (RDS)](#05-Database-Refresher)
+[05 Relational Database Service (RDS)](#05-Relational-Database-Service-RDS)
 
 [06 Network Storage](#06-Network-Storage)
 
@@ -1514,7 +1514,9 @@ if you like you can also just register domain via r53 but host your domain via 3
 
 EXAM: Key thing to remember is that r53 provides two separate roles. One is to register a domain on your behalf - Second to host the domain in r53. If you want  you can do either one of them and use 3rd party to do the second bit.
 
-## 05 Database Refresher
+## 05 Relational Database Service (RDS)
+
+## Database Refresher
 
 Databases are systems that store and manage data
 
