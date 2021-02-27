@@ -4,7 +4,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 **Table of Contents**
 
-[01 Elastic Compute Cloud - Basics](#01-Elastic-Compute-Cloud---Basics)
+[01 Elastic Compute Cloud-Basics](#01-Elastic-Compute-Cloud-Basics)
 
 [02 Introduction to Containers](#02-Introduction-to-Containers)
 
@@ -18,7 +18,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 [07 High Availability and Scaling](#07-High-Availability-and-Scaling)
 
-## 01 Elastic Compute Cloud - Basics
+## 01 Elastic Compute Cloud-Basics
 
 ## Elastic Block Store EBS Service Architecture 
 
