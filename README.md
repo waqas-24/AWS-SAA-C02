@@ -10,7 +10,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 [03 Advanced EC2](#03-Advanced-EC2)
 
-[04 Domain Name Service (DNS) Fundamentals](#04-Domain-Name-Service-DNS-Fundamentals)
+[04 Domain Name Service (DNS)](#04-Domain-Name-Service-DNS)
 
 [05 Relational Database Service (RDS)](#05-Database-Refresher)
 
@@ -1140,7 +1140,9 @@ You use dedicated hosts mostly for software licensing that use number of sockets
 - historically the network was shared between data and EBS. this caused lower performance for both data and EBS - since EBS is just a block storage connected to instance via network
 - EBS optimised means that at network level some optimisation has occurred and a dedicated storage capacity is provided to EBS - meaning faster speeds possible with EBS and data transfer over the network 
 
-## 04 Domain Name Service (DNS) Fundamentals
+## 04 Domain Name Service (DNS)
+
+## Domain Name Service (DNS) Fundamentals
 
 It's a discovery service. It's how systems are discovered in public and private networks
 
