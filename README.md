@@ -18,7 +18,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 [07 High Availability and Scaling](#07-High-Availability-and-Scaling)
 
-[08 Serverless & Application Services](#08-Serverless-&-Application-Services)
+[08 Serverless and Application Services](#08-Serverless-and-Application-Services)
 
 ## 01 Elastic Compute Cloud-Basics
 
@@ -2346,7 +2346,7 @@ IMPORTANT: With replication you can potentially replicate if you have corrupt da
     - Ideally it's best to have the session stored on a separate server such as DynamoDb
       - this way the session/state is in an external server and then the backend instances will become stateless again and load can then be balances easily via load balancer
 
-## 08 Serverless & Application Services
+## 08 Serverless and Application Services
 
 ## Architecture Evolution - Monolithic, Tiered, Queue, Microservices, Event Driven Architecture
 
