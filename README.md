@@ -20,7 +20,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 [08 Serverless and Application Services](#08-Serverless-and-Application-Services)
 
-[09 Global Content Delivery and Optimisation](09-Global-Content-Delivery-and-Optimisation)
+[09 Global Content Delivery and Optimisation](#09-Global-Content-Delivery-and-Optimisation)
 
 
 
