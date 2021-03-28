@@ -308,15 +308,92 @@ and traditional file transfer protocols like NFS and SMB
 
 ## FSx for Windows Servers
 
-FSx for Windows - can be integrated with AD
+- FSx for Windows is a fully managed single or Multi-AZ(within a VPC) native windows file server - it can be integrated with AD
 
-EFS is for Linux based instances only
+  - Can integrate with on-premises AD as well as AWS managed AD 
 
+- it's like EFS but that's dedicated to Linux based instances only
 
+- FSx for Windows file server is designed for integration with Windows environments
 
+- it uses Elastic Network interfaces inside the VPC
 
+- if you use single AZ mode - it uses replication within that AZ for resilience
 
+- can perform on-demand and Scheduled Backups - includes both client and AWS side backups
 
+- Accessible via VPC, Peering VPC, VPN, Direct Connect
+
+- EXAM: Look for windows related keywords like native windows file system, Active directory or Directory Service integration. Understand the difference between EFS and FSx as they are both network shared file systems
+
+- once setup it will be shared using normal double back slash shared location for example 
+
+  ```
+  \\fs-xxx123.animal4life.org\catpics
+  ```
+
+  once setup, workspaces can also use this location
+
+- it's a native windows file system that supports:
+  - de-duplication(sub file)
+  - Distributed File System (DFS)
+  - KMS at-rest encryption
+  - enforced encryption in-transit
+- The shares are accessed via SMB protocol which is standard in Windows environments and it also supports file level versioning (Volume Shadow Copies)
+- FSx is highly performant: 
+  - 8 MBps to 2 GBps 
+  - 100,000s IOPS
+  - <1 ms latency
+
+**Key features**
+
+- VSS - User-Driven restores 
+- Native windows file system accessible over SMB 
+  - EFS uses NFS protocol only uses Linux instances
+- provides Windows Permission Model
+- it supports DFS (Distributed File System) - scale-out file share structure
+- Managed - no file server administration required
+- can integrates with AWS Directory Service and your own AD directory
+
+## FSx for Lustre
+
+- designed for High Performance computing workloads 
+- FSx for Windows is a windows native file system, accessed via SMB. it is used for windows native environments 
+- Managed Lustre - Designed for High Performance Computing - Linux clients supports (POSIX file system permissions)
+- USE CASES: 
+  - Machine Learning
+  - Big Data
+  - Financial Modelling
+- Scale to 100 GB/s throughput and sub millisecond latency
+- Deployments in two modes
+  - Scratch - Highly optimised for short terms - no replication but super fast
+  - Persistent - longer term, HA (**in one AZ**), self healing
+- Accessible: VPC, VPN or Direct Connect from on-premises location - you need to have high bandwidth to fully use lustre
+- It can use S3 as a repository to store file - when the file is first access it gets lazy loaded from S3 into the file system. Once you make changes to data, it can then be exported back to S3 at any point using **hsm_archive**
+- Lustre store different components of the data in the file system,
+  - MetaData - File names, timestamps, permissions
+    - These are stored in Metadata Targets (MDTs)
+    - Lustre File system has one of MDTs
+  - Data
+    - The data is split over multiple storage object targets (OST) (each one of OST = 1.17 TiB in size)
+    - by splitting the data between these OST, the level of performance for Lustre is achieved
+- Performance provided by the file system is the baseline performance based on size of the file system
+- Size Minimum 1.2 TiB then increments of 2.4 TiB
+- Scratch - Base  200 MB/s per TiB of storage
+- Persistent offers 50 MB/s. 100 MB/s and 200 MB/s per TiB of storage
+- Both Types - Burst up to 1,300 MB/s per TiB (Credit System)
+  - you earn credit when you are using product below baseline performance  and you used these credits when you need to use Lustre above baseline performance
+- Once deployed you used Dist throughput and IOPS for read and write but for frequently accessed data, you use in-memory cache which is dependent on network throughput and IOPS
+
+**Key Points**
+
+- Scratch is designed for pure performance
+- Short terms or temp workloads
+- No HA or replication 
+- if you use larger file system for scratch that means more servers, more disks and more chance of failure
+- Persistent mode has replication but within on AZ only
+- it auto heals when hardware fails
+- You can backup to S3 with both manual and automatic mode(0 to 35 day retention)
 
 
 
