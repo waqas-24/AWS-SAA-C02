@@ -26,7 +26,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 [11 Hybrid Environments and Migration](#11-Hybrid-Environments-and-Migration)
 
-[12 Security, Deployment and Operations](#12-Security,-Deployment-and-Operations)
+[12 Security Deployment and Operations](#12-Security-Deployment-and-Operations)
 
 
 
@@ -3393,7 +3393,7 @@ and traditional file transfer protocols like NFS and SMB
 - it auto heals when hardware fails
 - You can backup to S3 with both manual and automatic mode(0 to 35 day retention)
 
-# 12 Security, Deployment and Operations
+# 12 Security Deployment and Operations
 
 ## AWS Secrets Manager
 
