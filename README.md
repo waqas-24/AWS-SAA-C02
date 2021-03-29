@@ -26,7 +26,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 [11 Hybrid Environments and Migration](#11-Hybrid-Environments-and-Migration)
 
-[12 Security, Deployment and Operations](12-Security,-Deployment-and-Operations)
+[12 Security, Deployment and Operations](#12-Security,-Deployment-and-Operations)
 
 
 
