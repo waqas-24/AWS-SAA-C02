@@ -28,7 +28,7 @@ These are my personal notes prepared for AWS Solutions Architect Associate(SAA) 
 
 [12 Security Deployment and Operations](#12-Security-Deployment-and-Operations)
 
-[13 NOSQL Databases & DynamoDB](#13-NOSQL-Databases-&-DynamoDB)
+[13 NOSQL Databases and DynamoDB](#13-NOSQL-Databases-and-DynamoDB)
 
 
 
@@ -3500,7 +3500,7 @@ Keywords - Global Perimeter Protection- Shield Layer 3 and 4 DDoS Protection and
     - Sensitive data findings - this findings are based on the pattern matching defined above. 
 - then findings can be viewed in AWS console or these can be sent to as an event to EventBridge which can then invoke lambda function to take action on the findings 
 
-# 13 NOSQL Databases & DynamoDB
+# 13 NOSQL Databases and DynamoDB
 
 ## DynamoDB - Architecture 
 
